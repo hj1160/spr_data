@@ -1,0 +1,23 @@
+package polymorphism;
+
+public class AppleSpeaker implements Speaker{
+
+	
+	
+	public AppleSpeaker() {
+		
+	}
+
+	@Override
+	public void volumeUp() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void volumeDown() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+}

@@ -1,0 +1,44 @@
+package com.springbook.biz.board.impl;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import org.springframework.stereotype.Repository;
+
+// DAO (Data Access Object)
+@Repository("boardDAO")
+public class BoardDAO {
+	//JDBC 관련 변수
+	private Connection conn = null;
+	private PreparedStatement stmt  = null;
+	private ResultSet rs = null ;
+	
+	// SQL 명령들
+	private final String BOARD_INSERT = "insert into board(seq, title, writer,content) values((select nvl(max(seq), 0)+1, from board),?,?,?)";
+	private final String BOARD_UPDATE = "insert into board(seq, title, writer,content) values((select nvl(max(seq), 0)+1, from board),?,?,?)";
+	private final String BOARD_DELETE = "insert into board(seq, title, writer,content) values((select nvl(max(seq), 0)+1, from board),?,?,?)";
+	private final String BOARD_GET = "insert into board(seq, title, writer,content) values((select nvl(max(seq), 0)+1, from board),?,?,?)";
+	private final String BOARD_LIST = "insert into board(seq, title, writer,content) values((select nvl(max(seq), 0)+1, from board),?,?,?)";
+	
+	
+	
+	
+	//CRUD 기능의 메소드 구현
+	// 글 등록
+	
+	
+	// 글 수정
+	
+	
+	// 글 삭제
+	
+	
+	// 글 상세 조회
+	
+	
+	// 글 목록 조회
+	
+	
+	
+}

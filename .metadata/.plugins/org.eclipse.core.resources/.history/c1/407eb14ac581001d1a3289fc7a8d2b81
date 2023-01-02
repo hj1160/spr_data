@@ -1,0 +1,55 @@
+package com.springbook.biz.user.impl;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import com.springbook.biz.board.BoardVO;
+import com.springbook.biz.common.JDBCUtil;
+import com.springbook.biz.user.UserVO;
+
+public class UserDAO {
+
+	//JDBC 관련 변수
+		private Connection conn = null;
+		private PreparedStatement stmt  = null;
+		private ResultSet rs = null ;
+		
+		// SQL 명령들
+		private final String USER_GET = "select * from users where id=? and password=?";
+		
+
+		//CRUD 기능의 메소드 구현
+		// 회원 등록
+
+
+		public UserVO getUser(UserVO vo) {
+			System.out.println("==> JDBC로 getUser() 기능처리");
+			UserVO user = null;
+			try {
+				conn = JDBCUtil.getConnection();
+				stmt = conn.prepareStatement(USER_GET);
+				stmt.setString(1, vo.getId());
+				stmt.setString(1, vo.getPassword());
+				rs = stmt.executeQuery();
+				if(rs.next()) {
+					board = new BoardVO();
+					board.setSeq(rs.getInt("SEQ"));
+					board.setTitle(rs.getString("TITLE"));
+					board.setWriter(rs.getString("WRITER"));
+					board.setContent(rs.getString("CONTENT"));
+					board.setRegDate(rs.getDate("REGDATE"));
+					board.setCnt(rs.getInt("CNT"));
+					
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				JDBCUtil.close(rs, stmt, conn);
+			}
+			
+			return board;
+			
+		}
+
+	}

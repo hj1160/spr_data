@@ -1,0 +1,32 @@
+package com.springbook.view.board;
+
+
+
+@Controller
+public class InsertBoardController {
+
+	
+	public void insertBoard(HttpServletRequest request) {
+		System.out.println("글 등록 처리");
+		
+		// 1사용자 입력 정ㅇ보 추출
+		// request.setCharacterEncoding("utf-8");
+		String title = request.getParameter("title");
+		String writer = request.getParameter("writer");
+		String content = request.getParameter("content");
+		
+		// 2. DB 연동ㅊ ㅓ리
+		BoardVO vo = new BoardVO();
+		vo.setTitle(title);
+		vo.setWriter(writer);
+		vo.setContent(content);
+		
+		BoardDAO boardDAO = new BoardDAO();
+		boardDAO.insertBoard(vo);
+		
+		// 3. 화면 내비게이션
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("redirect:getBoardList.do");
+		return mav;			
+	}
+}

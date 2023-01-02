@@ -1,0 +1,27 @@
+package com.springbook.biz.board.impl;
+
+import org.springframework.stereotype.Repository;
+
+// DAO (Data Access Object)
+@Repository("boardDAO")
+public class BoardDAO {
+	//JDBC 관련 변수
+	
+	//CRUD 기능의 메소드 구현
+	// 글 등록
+	
+	
+	// 글 수정
+	
+	
+	// 글 삭제
+	
+	
+	// 글 상세 조회
+	
+	
+	// 글 목록 조회
+	
+	
+	
+}

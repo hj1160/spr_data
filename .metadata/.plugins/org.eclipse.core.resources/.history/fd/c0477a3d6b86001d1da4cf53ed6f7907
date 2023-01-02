@@ -1,0 +1,6 @@
+package com.springbook.view.board;
+
+public class GetBoardListController implements Controller{
+
+	
+}

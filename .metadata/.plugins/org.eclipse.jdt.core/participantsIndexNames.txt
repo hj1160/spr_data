@@ -1,0 +1,13 @@
+INDEX VERSION 1.131
+D:\khj_data\spr_data\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\3178133098.index
+\ex00\src\main\java
+D:\khj_data\spr_data\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\4008603857.index
+\BoardWeb\src\main\java
+D:\khj_data\spr_data\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1823557430.index
+\test\src\main\java
+D:\khj_data\spr_data\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\2806564625.index
+\BoardWeb\src\main\java
+D:\khj_data\spr_data\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\1985579192.index
+\BoardWeb\src\main\java
+D:\khj_data\spr_data\.metadata\.plugins\org.eclipse.jst.jsp.core\jspsearch\3012140731.index
+\ex01\src\main\java

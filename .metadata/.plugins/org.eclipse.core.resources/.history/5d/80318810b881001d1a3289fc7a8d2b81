@@ -1,0 +1,9 @@
+package com.springbook.biz.board.impl;
+
+import org.springframework.stereotype.Repository;
+
+// DAO (Data Access Object)
+@Repository("boardDAO")
+public class BoardDAO {
+
+}

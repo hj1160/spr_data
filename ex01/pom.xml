@@ -78,8 +78,8 @@
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.2.15</version>
-			<exclusions>
+			<version>1.2.17</version>
+			<!--  <exclusions>
 				<exclusion>
 					<groupId>javax.mail</groupId>
 					<artifactId>mail</artifactId>
@@ -98,6 +98,7 @@
 				</exclusion>
 			</exclusions>
 			<scope>runtime</scope>
+			-->
 		</dependency>
 
 		<!-- @Inject -->
@@ -130,7 +131,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.7</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		
@@ -139,9 +140,18 @@
 		    <groupId>org.projectlombok</groupId>
 		    <artifactId>lombok</artifactId>
 		    <version>1.18.24</version>
-<!-- 		    <scope>provided</scope> -->
+			<!-- <scope>provided</scope> -->
 		</dependency>
-		        
+		
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>2.9.4</version>
+		</dependency>
+		
+		
+		
 	</dependencies>
     <build>
         <plugins>

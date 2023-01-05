@@ -15,6 +15,13 @@
    .no-underline{
       text-decoration:none;
    }
+   .side_menu{
+   		width:700px;
+   		height:200px;
+   		border:1px solid red;
+   		float:left;
+   		margin-top: -100px;
+   }
  </style>
   <meta charset="UTF-8">
   <title>사이드 메뉴</title>
@@ -29,7 +36,7 @@
    </h1> 
     -->
 	
-	<h1>
+	<h1 class="side_menu">
 		<a href="${contextPath}/member/listMembers.do"  class="no-underline">회원관리</a><br>
 		<a href="${contextPath}/board/listArticles.do"  class="no-underline">게시판관리</a><br>
 		<a href="#"  class="no-underline">상품관리</a><br>

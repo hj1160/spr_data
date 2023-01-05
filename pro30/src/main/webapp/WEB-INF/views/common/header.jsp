@@ -15,7 +15,7 @@
 <title>헤더</title>
 </head>
 <body>
-<table border=0  width="100%">
+<table border=0  width="100%" margin-bottom="100px">
   <tr>
      <td>
 		<a href="${contextPath}/main.do">

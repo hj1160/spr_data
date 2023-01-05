@@ -6,8 +6,12 @@
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
-		<item key="selection" value="log4j"/>
+		<item key="selection" value="/resources/"/>
 		<list key="findhistory">
+			<item value="../"/>
+			<item value="jun"/>
+			<item value="fileupload"/>
+			<item value="plug"/>
 			<item value="log4j"/>
 			<item value="1.6"/>
 			<item value="servlet"/>
@@ -19,6 +23,7 @@
 			<item value=" "/>
 		</list>
 		<list key="replacehistory">
+			<item value="/resources/"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">

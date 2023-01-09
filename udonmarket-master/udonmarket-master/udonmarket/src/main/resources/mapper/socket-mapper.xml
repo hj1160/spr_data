@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="socket">
+
+<!-- 알림  -->
+<select id="selectAllNoti" resultType="noti">
+	select
+		N.*,
+        (select nickname from member where sender = user_id) senderNickName
+	from 
+		notification_test N
+	where
+		receiver = #{userId}
+	order by 
+		noti_code desc
+</select>
+
+<!-- 알림 전체 개수 -->
+<select id="selectNotiTotalContents" resultType="_int">
+	select 
+		count(*) 
+	from 
+		notification_test 
+	where 
+		receiver = #{userId}
+</select>
+
+<!-- 알림 저장 -->
+<insert id="insertNoti">
+	insert into 
+		notification_test
+	values 
+		(noti_seq_test.nextval, 
+		 #{notiKind}, 
+		 #{sender}, 
+		 #{receiver}, 
+		 #{pCode}, 
+		 #{pTitle}, 
+		 #{notiContent}, 
+		 default)
+</insert>
+
+<!-- 알림 읽음 상태 변경 -->
+<update id="updateNotiCheck">
+	update 
+		notification_test 
+	set 
+		noti_check = 1 
+	where 
+		noti_code = #{notiCode}
+</update>
+
+<!-- 채팅 방 리스트 가져오기 -->
+<select id="selectChatRoom" resultType="chatRoom">
+	select R.*,
+	       (select title 
+	        from product 
+	        where R.p_code = product.p_code) title,
+	       (select user_id 
+	        from chat_user 
+	        where room_code = R.room_code 
+	        and user_id != #{userId}) sender,
+	       (select nickname 
+	        from chat_user CU, member M 
+	        where CU.user_id = M.user_id 
+	        and room_code = R.room_code 
+	        and CU.user_id != #{userId}) senderNickName,
+            (select enabled
+	        from chat_user 
+	        where room_code = R.room_code 
+	        and user_id != #{userId}) senderEnabled,
+	       	(select m.original_filename
+	        from chat_user cu left join member m on(cu.user_id = m.user_id)
+	        where room_code = R.room_code 
+	        and cu.user_id != #{userId}) originalFilename,
+            (select m.renamed_filename
+	        from chat_user cu left join member m on(cu.user_id = m.user_id)
+	        where room_code = R.room_code 
+	        and cu.user_id != #{userId}) renamedFilename
+	from chat_room R 
+
+	where R.room_code in (select R.room_code
+	                    from chat_room R
+	                        join chat_user U
+	                            on R.room_code = U.room_code
+	                    where user_id = #{userId}
+	                    and u.enabled = 1)
+	order by room_code desc
+</select>
+
+<!-- 채팅 방 존재 여부 -->
+<select id="selectChatRoomOne" resultType="chatRoom">
+	select 
+		* 
+	from 
+		chat_room R, chat_user U
+	where 
+		R.room_code = U.room_code
+	and 
+		p_code = #{pCode}
+	and 
+		user_id = #{userId}
+</select>
+
+<!-- 채팅방 추가 -->
+<insert id="insertChatRoom">
+	insert into 
+		chat_room 
+	values(SEQ_CHAT_ROOM.nextval, #{pCode}, sysdate)
+	<selectKey keyProperty="roomCode" resultType="_int" order="AFTER">
+		select 
+			seq_chat_room.currval
+		from
+			dual
+	</selectKey>
+</insert>
+
+<!-- 채팅방 참여자 추가 -->
+<insert id="insertChatUser">
+	insert into 
+		chat_user 
+	values(#{userId}, #{roomCode}, default)
+</insert>
+<insert id="insertChatSeller">
+	insert into 
+		chat_user 
+	values(#{seller}, #{roomCode}, default)
+</insert>
+
+<!-- 채팅방 떠나기 -->
+<update id="leaveChatRoom">
+	update 
+		chat_user 
+	set 
+		enabled = 0 
+	where 
+		user_id = #{userId} 
+	and 
+		room_code = #{roomCode}
+</update>
+
+<!-- 채팅방 다시 활성화 -->
+<update id="enterChatRoom">
+	update 
+		chat_user 
+	set 
+		enabled = 1 
+	where 
+		room_code = #{roomCode}
+</update>
+
+<!-- 대화 내용 가져오기 -->
+<select id="selectChatMsg" resultType="chatMessage">
+	select MSG.*, 
+      	   nickname
+	from message MSG
+	    join member M
+	        on msg.user_id = m.user_id
+	where room_code = #{roomCode}
+	order by chat_date desc
+</select>
+
+<!-- 메세지 테이블에 추가 -->
+<insert id="insertMsg">
+	insert into 
+		message 
+	values(SEQ_MESSAGE.nextval,
+		    #{roomCode},
+		    #{userId},
+		    #{chatContent},
+		    sysdate,
+		    #{originalFileName},
+		    #{renamedFileName})
+</insert>
+
+</mapper>
+
+
+
+
+
+
+
+
+

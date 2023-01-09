@@ -6,8 +6,12 @@
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
-		<item key="selection" value="/resources/"/>
+		<item key="selection" value="a href"/>
 		<list key="findhistory">
+			<item value="move"/>
+			<item value="a href"/>
+			<item value="a gerf"/>
+			<item value="actionForm"/>
 			<item value="../"/>
 			<item value="jun"/>
 			<item value="fileupload"/>
@@ -19,8 +23,6 @@
 			<item value="w"/>
 			<item value="weve"/>
 			<item value="wa"/>
-			<item value="Aspectj"/>
-			<item value=" "/>
 		</list>
 		<list key="replacehistory">
 			<item value="/resources/"/>

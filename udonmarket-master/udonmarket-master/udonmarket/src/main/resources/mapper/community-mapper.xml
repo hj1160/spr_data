@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="community">
+
+
+	<!-- 게시글 조회 & 검색 -->
+	<select id="selectCommunityList" resultType="community">
+	<![CDATA[
+		select 
+			b.*,
+		    m.nickname,
+            m.address,
+            p.upload_path,
+            p.uuid,
+            p.original_filename,
+            (SELECT COUNT(reply_code) FROM reply r WHERE r.b_code = b.b_code) as reply_count
+		from 
+		    board b
+		   		left join
+    				member m on(b.user_id = m.user_id)
+                left join
+                    board_photo p on(b.b_code = p.b_code)
+    	where b.user_id in (
+		                        select l.user_id 
+		                        from location l,(select latitude, longitude, radius from location where user_id = #{userId}) a
+		                        where calc_distance(a.latitude, a.longitude, l.latitude, l.longitude) < a.radius
+		                        ) and b.user_id not in (select block_id from block where user_id = #{userId})
+    	]]>
+
+			
+					
+			
+			<if test="searchType=='board_title' and keyword != null and keyword != '' ">
+
+				<![CDATA[AND b.board_title like '%${keyword}%' ]]>
+
+			</if>
+
+			<if test="searchType=='board_content' and keyword != null and keyword != '' ">
+
+				<!-- AND b.board_content like CONCAT('%' || #{keyword}, '%') -->
+				<![CDATA[AND b.board_content like '%${keyword}%' ]]>
+
+			</if>
+			
+			<if test="categoryCode==17">
+
+				AND b.category_code = 17
+
+			</if>
+			
+			<if test="categoryCode==18">
+
+				AND b.category_code = 18
+
+			</if>
+			
+			<if test="categoryCode==19">
+
+				AND b.category_code = 19
+
+			</if>
+			
+			<if test="categoryCode==20">
+
+				AND b.category_code = 20
+
+			</if>
+			
+			<if test="hashtagCode==1">
+
+				AND b.hashtag_code = 1
+
+			</if>
+			
+			<if test="hashtagCode==2">
+
+				AND b.hashtag_code = 2
+
+			</if>
+			
+			<if test="hashtagCode==3">
+
+				AND b.hashtag_code = 3
+
+			</if>
+			
+			<if test="hashtagCode==4">
+
+				AND b.hashtag_code = 4
+
+			</if>
+			
+			<if test="hashtagCode==5">
+
+				AND b.hashtag_code = 5
+
+			</if>
+			
+			<if test="hashtagCode==6">
+
+				AND b.hashtag_code = 6
+
+			</if>
+			
+			<if test="hashtagCode==7">
+
+				AND b.hashtag_code = 7
+
+			</if>
+			
+			<if test="hashtagCode==8">
+
+				AND b.hashtag_code = 8
+
+			</if>
+			
+			<if test="hashtagCode==9">
+
+				AND b.hashtag_code = 9
+
+			</if>
+			
+			<!-- <if test="categoryCode==22">
+
+				AND category_code = 22
+
+			</if> -->
+			
+
+		order by b.b_code desc
+	</select>
+	
+	<!-- 최근게시글 -->
+	<select id="selectCommunityNewList" resultType="community">
+	<![CDATA[
+		select 
+			b.*,
+		    m.nickname,
+            m.address,
+            p.upload_path,
+            p.uuid,
+            p.original_filename
+		from 
+		    board b
+		   		left join
+    				member m on(b.user_id = m.user_id)
+    			left join
+                    board_photo p on(b.b_code = p.b_code)
+    	where b.user_id in (
+		                        select l.user_id 
+		                        from location l,(select latitude, longitude, radius from location where user_id = #{userId}) a
+		                        where calc_distance(a.latitude, a.longitude, l.latitude, l.longitude) < a.radius
+		                        ) and b.user_id not in (select block_id from block where user_id = #{userId})
+    	]]>
+
+			
+					
+			
+			<if test="searchType=='board_title' and keyword != null and keyword != '' ">
+
+				<![CDATA[AND b.board_title like '%${keyword}%' ]]>
+
+			</if>
+
+			<if test="searchType=='board_content' and keyword != null and keyword != '' ">
+
+				<!-- AND b.board_content like CONCAT('%' || #{keyword}, '%') -->
+				<![CDATA[AND b.board_content like '%${keyword}%' ]]>
+
+			</if>
+			
+			<if test="categoryCode==17">
+
+				AND b.category_code = 17
+
+			</if>
+			
+			<if test="categoryCode==18">
+
+				AND b.category_code = 18
+
+			</if>
+			
+			<if test="categoryCode==19">
+
+				AND b.category_code = 19
+
+			</if>
+			
+			<if test="categoryCode==20">
+
+				AND b.category_code = 20
+
+			</if>
+			
+			<if test="hashtagCode==1">
+
+				AND b.hashtag_code = 1
+
+			</if>
+			
+			<if test="hashtagCode==2">
+
+				AND b.hashtag_code = 2
+
+			</if>
+			
+			<if test="hashtagCode==3">
+
+				AND b.hashtag_code = 3
+
+			</if>
+			
+			<if test="hashtagCode==4">
+
+				AND b.hashtag_code = 4
+
+			</if>
+			
+			<if test="hashtagCode==5">
+
+				AND b.hashtag_code = 5
+
+			</if>
+			
+			<if test="hashtagCode==6">
+
+				AND b.hashtag_code = 6
+
+			</if>
+			
+			<if test="hashtagCode==7">
+
+				AND b.hashtag_code = 7
+
+			</if>
+			
+			<if test="hashtagCode==8">
+
+				AND b.hashtag_code = 8
+
+			</if>
+			
+			<if test="hashtagCode==9">
+
+				AND b.hashtag_code = 9
+
+			</if>
+			
+			<!-- <if test="categoryCode==22">
+
+				AND category_code = 22
+
+			</if> -->
+			
+
+		order by b.b_code desc
+	</select>
+	
+	<!-- 페이징 용 카운트 -->
+	<select id="selectCount" resultType="_int">
+	<![CDATA[
+		select count(b.b_code) from board b
+		where (b.user_id in (
+		                        select l.user_id 
+		                        from location l,(select latitude, longitude, radius from location where user_id = #{userId}) a
+		                        where calc_distance(a.latitude, a.longitude, l.latitude, l.longitude) < a.radius
+		                        ) and b.user_id not in (select block_id from block where user_id = #{userId})
+              
+	]]>
+		<if test="categoryCode==17">
+
+				AND b.category_code = 17
+
+			</if>
+			
+			<if test="categoryCode==18">
+
+				AND b.category_code = 18
+
+			</if>
+			
+			<if test="categoryCode==19">
+
+				AND b.category_code = 19
+
+			</if>
+			
+			<if test="categoryCode==20">
+
+				AND b.category_code = 20
+
+			</if>
+			<if test="hashtagCode==1">
+
+				AND b.hashtag_code = 1
+
+			</if>
+			
+			<if test="hashtagCode==2">
+
+				AND b.hashtag_code = 2
+
+			</if>
+			
+			<if test="hashtagCode==3">
+
+				AND b.hashtag_code = 3
+
+			</if>
+			
+			<if test="hashtagCode==4">
+
+				AND b.hashtag_code = 4
+
+			</if>
+			
+			<if test="hashtagCode==5">
+
+				AND b.hashtag_code = 5
+
+			</if>
+			
+			<if test="hashtagCode==6">
+
+				AND b.hashtag_code = 6
+
+			</if>
+			
+			<if test="hashtagCode==7">
+
+				AND b.hashtag_code = 7
+
+			</if>
+			
+			<if test="hashtagCode==8">
+
+				AND b.hashtag_code = 8
+
+			</if>
+			
+			<if test="hashtagCode==9">
+
+				AND b.hashtag_code = 9
+
+			</if>
+             <![CDATA[ ) ]]>
+	</select>
+	
+	<!-- 게시글 상세 -->
+	<select id="selectOneCommunityCollection" resultMap="communityCollectionMap">
+		select 
+		    b.b_code,
+            b.user_id,
+            b.category_code,
+            b.board_title,
+            b.board_content,
+            b.reg_date,
+            b.hashtag_code,
+           	b.like_this,
+		    m.nickname,
+            m.address,
+            (SELECT COUNT(reply_code) FROM reply WHERE b_code = #{bCode}) as reply_count,
+            m.original_filename,
+            m.renamed_filename
+		from 
+		    board b
+		   		left join
+    				member m on(b.user_id = m.user_id)
+		where 
+		    b.b_code = #{ bCode }
+	</select>
+	<resultMap type="community" id="communityCollectionMap">
+		<id column="b_code" property="bCode"/>
+		<result column="user_id" property="userId"/>
+		<result column="board_title" property="boardTitle"/>
+		<result column="board_content" property="boardContent"/>
+		<result column="reg_date" property="regDate"/>
+		<result column="hashtag_code" property="hashtagCode"/>
+		<result column="like_this" property="likeThis"/>
+	</resultMap>
+	
+	<!-- <select id="selectCommunityCategory" resultType="community">
+		select * from board where category_code = #{ categoryCode } order by b_code desc
+	</select> -->
+	
+
+	<!-- 게시글 등록 -->
+	<insert id="insert">
+		insert into board values (
+		SEQ_BOARD_NO.nextval,
+		#{userId},
+		#{categoryCode},
+		#{boardTitle},
+		#{boardContent},
+		sysdate,
+		<if test="hashtagCode==100">
+
+				null,
+
+		</if>
+		<if test="hashtagCode!=100">
+
+				#{hashtagCode},
+
+		</if>
+		0
+		)
+		<selectKey keyProperty="bCode" resultType="_int" order="AFTER">
+		select seq_board_no.currval from dual
+		</selectKey>
+	</insert>
+	
+	<!-- 게시글 수정 폼 -->
+	<select id="selectByBCode" resultType="community">
+		select * from board where b_code = #{bCode}
+	</select>
+	
+	<!-- 게시글 수정 -->
+	<update id="update">
+		update board set 
+		category_code=#{categoryCode}, board_title=#{boardTitle}, board_content=#{boardContent}
+		<if test="hashtagCode!=100">
+		,hashtag_code=#{hashtagCode}
+		</if>
+		where b_code = #{bCode}
+	</update>
+	
+	<!-- 게시글 삭제 -->
+	<delete id="delete">
+		delete from board where b_code = #{bCode}
+	</delete>
+	
+	<!-- 좋아요 -->
+	<insert id="createBoardLike">
+            INSERT INTO like_this VALUES(
+		#{bCode}, 
+		#{userId}
+		)
+        </insert>
+        
+        
+        <!-- 게시글 사진 bCode update -->
+	<update id="updateCommunityCode" parameterType="java.util.Map">
+		update board_photo set b_code = #{bCode}
+		where uuid in
+		<foreach collection="uuids" item="item" index="i" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<!--  사진 추가 -->
+	<insert id="insertPhoto">
+		insert into board_photo values
+		(
+			seq_board_photo.nextval, null, #{originalFilename}, #{uuid}, #{uploadPath}
+		)
+	</insert>
+	
+	<!--  사진 삭제(게시글 등록 페이지) -->
+	<delete id="deletePhoto">
+		delete from board_photo where uuid = #{uuid}
+	</delete>
+	
+	<!--  사진 불러오기 -->
+	<select id="selectPhotos" resultType="boardphoto">
+		select * from board_photo where b_code = #{bCode}
+	</select>
+
+       <!--  <delete id="deleteBoardLike">
+            DELETE FROM like_this
+            WHERE b_code = #{bCode} AND user_id = #{userId}
+        </delete>
+
+        <select id="updateBoardLike">
+            UPDATE board
+            SET
+            like_this = (SELECT COUNT(*)
+            FROM like_this
+            WHERE b_code = #{bCode})
+            WHERE b_code = #{bCode}
+        </select>
+
+        <select id="getBoardLike" resultType="int">
+            SELECT COUNT(like_id) FROM like_this WHERE b_code = #{bCode} AND user_id = #{userId}
+        </select> -->
+        
+     <!-- 신고목록 -->
+	<select id="reasonReport" resultType="reasonReportVO">
+		select * from reason_report where parent_code = 3
+	</select>
+	
+	<select id="reasonReport2" resultType="reasonReportVO">
+		select * from reason_report where parent_code = 4
+	</select>
+	
+	<select id="reportListByRCode" resultType="reasonReportVO">
+		select r.* ,connect_by_isleaf leaf
+        from  reason_report r
+        start with reason_code = #{reasonCode}
+        connect by prior reason_code=parent_code
+	</select>
+	
+	<select id="reportListByRCode2" resultType="reasonReportVO">
+		select r.* ,connect_by_isleaf leaf
+        from  reason_report r
+        start with reason_code = #{reasonCode}
+        connect by prior reason_code=parent_code
+	</select>
+	
+	<!-- 신고하기 -->
+	<insert id="reportBoard">
+		insert into report values 
+		(seq_report.nextval, #{reasonCode}, #{reportId}, null, #{bCode}, null, 0, null)
+	</insert>
+	
+	<insert id="reportReply">
+		insert into report values 
+		(seq_report.nextval, #{reasonCode}, #{reportId}, null, null, #{replyCode}, 0, null)
+	</insert>
+	<insert id="reportUser">
+		insert into report values 
+		(seq_report.nextval, #{reasonCode}, #{reportId}, #{shooterId}, null, null, 0, null)
+	</insert>
+
+
+<!-- 	신고관리(동네생활) -->
+	<select id="selectReportList" resultType="report">
+		select R.report_code, R.reason_code,R.report_id, R.b_code, RR.reason_content
+		from report R left join reason_report RR on R.reason_code = RR.reason_code
+		where R.b_code is not null
+	</select>	
+	
+
+</mapper>

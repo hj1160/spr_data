@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="member">
+
+<!-- 내 동네 설정 업데이트 -->
+<update id="updateLocation">
+	update
+		location
+	set
+		latitude = #{latitude},
+		longitude = #{longitude}
+	where 
+		user_id = #{userId}
+</update>
+
+<!-- Member주소 업데이트 -->
+<update id="updateAddr">
+	update 
+		member 
+	set 
+		address = #{address} 
+	where 
+		user_id = #{userId}
+</update>
+
+<!-- 지역 범위 가져오기 -->
+<select id="selectRadius" resultType="_int">
+	select 
+		radius 
+	from 
+		location 
+	where user_id = #{userId}
+</select>
+
+<!-- 지역 범위 수정 -->
+<update id="updateRadius">
+	update
+		location
+	set
+		radius = #{radius}
+	where 
+		user_id = #{userId}
+</update>
+
+<!-- 키워드 중복 검사용 -->
+<select id="selectKeyword" resultType="_int">
+	select 
+		count(*) 
+	from 
+		keyword 
+	where 
+		user_id = #{userId} 
+	and 
+		key_content = #{keyword}
+</select>
+
+<!-- 키워드 추가 -->
+<insert id="insertKeyword">
+	insert into
+		keyword
+	values(
+		seq_keyword.nextval,
+		#{userId},
+		#{keyContent}
+	)
+	<selectKey keyProperty="keyCode" resultType="_int" order="AFTER">
+		select
+        	seq_keyword.currval
+    	from 
+        	dual
+	</selectKey>
+</insert>
+
+<!-- 키워드 가져와서 view단 뿌리기 용 -->
+<select id="selectKeywordList" resultType="keyword">
+	select 
+		* 
+	from 
+		keyword 
+	where 
+		user_id = #{userId}
+</select>
+
+<!-- 키워드 갯수 -->
+<select id="selectTotalKeywordContent" resultType="_int" >
+	select 
+		count(*) 
+	from 
+		keyword 
+	where 
+		user_id = #{userId}
+</select>
+
+<!-- 키워드 삭제 -->
+<delete id="deleteKeyword">
+	delete from
+		keyword
+	where 
+		key_code = #{keyCode}
+</delete>
+
+<!-- 키워드 모두 가져오기 -->
+<select id="selectAllkeywordList" resultType="keyword">
+	select * from keyword
+</select>
+
+<!-- 회원가입 -->
+<insert id="insertMember">
+	insert into member
+	values(#{userId},#{password},#{email},#{nickName},null,default,null,default,default,default)
+</insert>
+<insert id="insertLocation">
+	insert into location
+	values (#{userId}, '37.4969519', '127.0261588','3')
+</insert>
+<insert id="insertAuthority">
+	insert into authority
+	values (default, #{userId})
+</insert>
+<insert id="insertScore">
+	insert into Score
+	values (#{userId}, '36.5' , '1')
+</insert>
+<insert id="insertEvaluate" parameterType="java.util.Map">
+	insert all 
+    <foreach collection="list" item="item" index="index" separator=" ">
+        into evaluate(eva_code, user_id, count) values (#{item}, #{userId}, 0)
+    </foreach> 
+    select * from dual 
+</insert>
+
+
+<!-- 로그인 -->
+<select id="selectOneMember" resultMap="memberMap">
+	select 
+		M.*,
+        (select round(total_score/count, 2) from score where score.user_id = M.user_id) score
+	from 
+		member M
+	where 
+		M.user_id = #{userId}
+</select>
+
+<!-- 관리자 회원 조회 여기에 where 절 조건 삽입--> 
+<select id="selectMemberList" resultMap="memberMap">
+ 	select *
+ 	from member
+ 	where quit_yn = 'N'
+ 	order by reg_date desc
+</select>
+
+<select id="selectMemberTotalContents" resultType="_int">
+	select count(*)
+	from member
+	where quit_yn = 'N'
+</select>
+
+<!-- 아이디 중복검사 -->
+<select id="userIdCheck" parameterType="String" resultType="int">
+	select count(*)
+	from member
+	where user_id = #{userId}
+</select>
+
+<select id="selectOnePasswordMember" resultMap="memberMap">
+	select *
+	from member
+	where password = #{password}
+</select>
+
+<resultMap type="member" id="memberMap">
+
+</resultMap>
+
+<!-- 관리자에서 멤버 quit_yn == y로하기 -->
+<update id="updateQuitMember">
+	update member
+	set quit_yn = 'Y'
+	where user_id = #{userId}
+</update>
+
+
+<!-- 임시 비밀번호로 패스워드 변경 -->
+<update id="updatePassword" parameterType="java.util.Map">
+	update member
+	set password = '1234'
+	where user_id = #{userId} and email = #{email}
+</update>
+
+<!-- 변경한 패스워드 가져오기 -->
+<select id="selectGetPassword" parameterType="java.util.Map" resultType="java.lang.String">
+	select password
+	from member
+	where user_id = #{userId} and email = #{email}
+</select>
+
+<!-- 가져온 패스워드를 암호화하여 DB 변경하기 -->
+<update id="updateEncrpytPassword" parameterType="java.util.Map">
+	update member
+	set password = #{param1}
+	where user_id = #{userId} and email = #{email}
+</update>
+
+<!-- 매너 평가 조회하기 -->
+<select id="selectAllEva" resultType="evaluate">
+	select 
+	    * 
+	from 
+	    evaluate E, evaluation EE
+	where 
+	    E.eva_code = EE.eva_code
+	and
+	    user_id = #{userId}
+	and
+		count != 0
+	order by
+	    count desc
+</select>
+
+<update id="udpateProfile">
+	update member
+	set renamed_filename = #{renamedFileName}
+	where user_id = #{userId}
+
+</update>
+
+<!-- 거래 후기 총 개수 -->
+<select id="selectTotalReview" resultType="_int">
+	select 
+		count(*)
+	from 
+		review 
+	where 
+		recipient = #{userId} 
+</select>
+
+<!-- 거래 후기 조회하기 -->
+<select id="selectAllReview" resultType="review">
+	select 
+		* 
+	from 
+		review 
+	where 
+		recipient = #{userId}
+	order by
+		review_code desc
+</select>
+
+<!-- 공지사항 조회 -->
+<select id="selectAnnounceList" resultType="com.kh.udon.member.model.vo.announce">
+	select
+		*
+	from 
+		board
+	order by
+		b_code desc
+</select>
+
+<!-- 판매 내역 조회하기 -->
+<select id="selectAllSalesPro" resultType="wish">
+	select 
+		P.seller,
+        P.p_code,
+        P.title,
+        M.address sellerAddr,
+        trade_status,
+        P.price,
+        P.category,
+        C.category_name categoryName,
+        (select count(*) from wish where wish.p_code = p.p_code) totalWish,
+        (select review_code from review where sender = P.buyer and review.p_code = P.p_code) reviewCode,
+        P.trade_status,
+        p.open_status,
+        (select count(*) from chat_room where chat_room.p_code = P.p_code) totalChat,
+        Photo.upload_path,
+        photo.original_filename,
+        photo.uuid
+	from product P
+		left join (select * from product_photo where photo_code in (select min(photo_code) from product_photo group by p_code)) photo on(p.p_code = photo.p_code)
+    	join member M
+        	on P.seller = M.user_id
+        join category C
+        	on P.category = C.category_code
+	where 
+		P.seller = #{userId}
+	and 
+		P.delete_yn = 'N'
+	order by 
+		P.reg_date desc
+</select>
+
+<!-- 구매 내역 조회하기 -->
+<select id="selectAllBuyPro" resultType="wish">
+	select 
+		P.buyer,
+		P.seller,
+	    P.p_code,
+	    P.title,
+	    M.address sellerAddr,
+	    trade_status,
+	    P.price,
+	    (select count(*) from wish where wish.p_code = p.p_code) totalWish,
+	    (select review_code from review where sender = P.buyer and review.p_code = P.p_code) reviewCode,
+	    (select count(*) from chat_room where chat_room.p_code = P.p_code) totalChat,
+        Photo.upload_path,
+        photo.original_filename,
+        photo.uuid
+	from product P
+        left join (select * from product_photo where photo_code in (select min(photo_code) from product_photo group by p_code)) photo on(p.p_code = photo.p_code)
+	    join member M
+	        on P.seller = M.user_id
+	where 
+		P.buyer = #{userId}
+	and 
+		P.delete_yn = 'N'
+	and 
+		open_status = 1
+	order by 
+		P.reg_date desc
+</select>
+
+<!-- 관심 목록 조회하기 -->
+<select id="selectAllWishPro" resultType="wish">
+	select 
+		W.wish_code,
+        W.user_id,
+        W.p_code,
+        P.title,
+        M.address sellerAddr,
+        P.price,
+        (select count(*) from wish where wish.p_code = p.p_code) totalWish,
+        Photo.upload_path,
+        photo.original_filename,
+        photo.uuid
+	from 
+		wish W 
+	    join product P 
+	    	on W.p_code = P.p_code
+	    left join (select * from product_photo where photo_code in (select min(photo_code) from product_photo group by p_code)) photo on(p.p_code = photo.p_code)
+	    join member M 
+	    	on P.seller = M.user_id
+	where 
+		W.user_id = #{userId}
+	and 
+		P.delete_yn = 'N'
+	and 
+		open_status = 1
+	order by 
+		wish_code desc
+</select>
+
+<!-- 관심 목록에서 삭제하기 -->
+<delete id="deleteWish">
+	delete from
+		wish
+	where 
+		wish_code = #{wishCode}
+</delete>
+
+<!-- 관심 목록에 추가하기 -->
+<insert id="insertWish">
+	insert into
+		wish 
+	values(
+		#{wishCode}, 
+		#{userId}, 
+		#{pCode}
+	)
+</insert>
+
+<!-- 공지사항 등록 -->
+<insert id="announceEnroll">
+	insert into
+		board
+	values(
+		SEQ_BOARD_NO.nextval,
+		#{userId},
+		#{categoryCode},
+		#{boardTitle},
+		#{boardContent},
+		sysdate ,
+		null,
+		0
+	)
+</insert>
+
+<!-- 공지사항 삭제 -->
+<delete id="delete">
+	delete from 
+		board 
+	where 
+		b_code = #{bCode}
+</delete>
+
+<select id="selectOneAnnounce" resultType="com.kh.udon.member.model.vo.announce">
+	select
+		*
+	from 
+		board
+	where 
+		Board.b_code = #{ bCode }
+</select>
+
+<!-- 회원 닉네임 변경 -->
+<update id="updateNick">
+update 
+	member
+set 
+    nickname=#{nickName}
+where 
+	user_id=#{ userId }
+</update>
+
+<select id="selectPostList" resultMap="PostMap">
+	select
+		*
+	from 
+		board
+	where 
+		user_id=#{userId}
+</select>
+
+	<resultMap type="community" id="PostMap">
+		<id column="b_code" property="bCode"/>
+		<result column="user_id" property="userId"/>
+		<result column="board_title" property="boardTitle"/>
+		<result column="board_content" property="boardContent"/>
+		<result column="reg_date" property="regDate"/>
+		<result column="hashtag_code" property="hashtagCode"/>
+		<result column="like_this" property="likeThis"/>
+	</resultMap>
+	
+	<select id="selectReplyList" resultType="com.kh.udon.community.model.vo.Reply">
+	select
+		*
+	from 
+		reply
+	where 
+		user_id = #{userId}
+</select>
+
+<!-- 차단 사용자 가져오기 -->
+<select id="selectAllBlockUser" resultType="block">
+	select 
+		b.user_id userId,
+        block_id blockUserId, 
+        m.nickname blockUserNickName,
+        m.address blockUserAddr,
+        m.original_filename,
+        m.renamed_filename
+	from 
+		block B, member M
+	where 
+		b.block_id = m.user_id
+	and 
+		b.user_id = #{userId}
+</select>
+
+<!-- 차단사용자 추가하기 -->
+<insert id="insertBlockUser">
+	insert into
+		block
+	values(#{userId}, #{blockUserId})
+</insert>
+
+<!-- 차단사용자 해제하기 -->
+<delete id="deleteBlockUser">
+	delete
+		block
+	where 
+		user_id = #{userId}
+	and
+		block_id = #{blockUserId}
+</delete>
+
+<select id="selectDeclareMemberList" resultType="report">
+	select R.report_code, R.reason_code,R.report_id, R.shooter_id, RR.reason_content
+	from report R left join reason_report RR on R.reason_code = RR.reason_code
+	where R.shooter_id is not null
+
+</select>
+
+<select id="checkPwd" resultType="int">
+	select
+		count(*)
+	from 
+		member
+	where
+		user_id = #{userId} AND password = #{password}
+</select>
+
+<update id="updatePwd">
+update 
+	member
+set 
+    password=#{password}
+where 
+	user_id=#{ userId }
+</update>
+
+<select id="selectRankSeller" resultType="rankSeller">
+	select 
+	    seller, 
+	    count(*) count
+	from 
+	    product 
+	group by 
+	    seller
+	order by count desc
+</select>
+
+
+
+
+</mapper>

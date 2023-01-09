@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="communityReply">
+
+	<select id="ReplyList" resultType="Reply">
+
+		SELECT
+		 r.reply_code, 
+		    r.b_code,
+		    r.content,
+		    r.user_id, 
+		    r.reg_date,
+		    m.nickname,
+		    (SELECT COUNT(reply_code) FROM reply WHERE b_code = #{bCode}) as reply_count,
+		    m.original_filename,
+		    m.renamed_filename
+		FROM
+		    reply r
+		        left join
+		            member m on(r.user_id = m.user_id)
+
+		WHERE
+
+			b_code = #{bCode}
+
+		ORDER BY reg_date desc
+
+	</select>
+	
+	<insert id="saveReply" parameterType="com.kh.udon.community.model.vo.Reply">
+
+		insert into reply values(
+    		seq_reply.nextval,
+		    1,
+		    #{userId},
+		    #{content},
+		    #{bCode},
+		    null,
+		    sysdate
+		)
+
+	</insert>
+
+	
+
+	<update id="updateReply" parameterType="com.kh.udon.community.model.vo.Reply">
+
+		UPDATE reply SET
+
+			content = #{content}
+
+		WHERE
+
+			reply_code = #{replyCode}
+
+	</update>
+
+	
+
+	<delete id="deleteReply" parameterType="int">
+
+		DELETE FROM reply
+
+		WHERE
+
+			reply_code = #{replyCode}
+
+	</delete>
+	
+	
+<!-- 	신고관리(댓글) -->
+	<select id="selectReplyList" resultType="report">
+		select R.report_code, R.reason_code, R.report_id, R.reply_code, RR.reason_content
+		from report R left join reason_report RR on R.reason_code = RR.reason_code
+		where R.reply_code is not null
+	</select>
+	
+	
+</mapper>

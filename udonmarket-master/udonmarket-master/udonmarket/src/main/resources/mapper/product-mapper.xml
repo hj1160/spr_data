@@ -1,0 +1,445 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="product">
+
+	<!-- 메인 -->
+	<select id="oneToTen" resultType="productDTO">
+		select x.*
+		from
+		(
+		    select p.p_code, p.seller, p.title, p.price, p.pull, trunc(sysdate - p.reg_date) reg_date, substr(m.address, instr(m.address, ' ', 1, 1), instr(m.address, ' ', 1, 2)) address, wc.wish, cc.chat, row_number()over(order by wc.wish desc) rnum,
+				   photo.uuid, photo.original_filename, photo.upload_path
+		    from product p left join member m on(p.seller = m.user_id)
+		        	   	   left join (select a.p_code p_code, count(b.p_code) wish from product a left outer join wish b on(a.p_code = b.p_code) group by a.p_code) wc on(wc.p_code = p.p_code)
+		       		   	   left join (select a.p_code p_code, count(b.p_code) chat from product a left outer join chat_room b on(a.p_code = b.p_code) group by a.p_code) cc on(cc.p_code = p.p_code)
+		               	   left join (select * from product_photo where photo_code in (select min(photo_code) from product_photo group by p_code)) photo on(p.p_code = photo.p_code)
+		    where (p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N')
+		)x
+		where x.rnum between 1 and 8
+	</select>
+	<select id="elevenToTwenty" resultType="productDTO">
+		select x.*
+		from
+		(
+		    select p.p_code, p.seller, p.title, p.price, p.pull, trunc(sysdate - p.reg_date) reg_date, substr(m.address, instr(m.address, ' ', 1, 1), instr(m.address, ' ', 1, 2)) address, wc.wish, cc.chat, row_number()over(order by wc.wish desc) rnum,
+			   	   photo.uuid, photo.original_filename, photo.upload_path
+		    from product p left join member m on(p.seller = m.user_id)
+		    		       left join (select a.p_code p_code, count(b.p_code) wish from product a left outer join wish b on(a.p_code = b.p_code) group by a.p_code) wc on(wc.p_code = p.p_code)
+					       left join (select a.p_code p_code, count(b.p_code) chat from product a left outer join chat_room b on(a.p_code = b.p_code) group by a.p_code) cc on(cc.p_code = p.p_code)
+		              	   left join (select * from product_photo where photo_code in (select min(photo_code) from product_photo group by p_code)) photo on(p.p_code = photo.p_code)
+		    where (p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N')
+		)x
+		where x.rnum between 9 and 16	
+	</select>
+	
+	<!-- 우리동네 인기상품 -->
+	<select id="popular" resultType="productDTO">
+	<![CDATA[
+		select x.*
+		from
+		(
+			select p.p_code, p.seller, p.title, p.price, p.pull, trunc(sysdate - p.reg_date) reg_date, substr(m.address, instr(m.address, ' ', 1, 1), instr(m.address, ' ', 1, 2)) address, wc.wish, cc.chat,
+				   photo.uuid, photo.original_filename, photo.upload_path, row_number()over(order by wc.wish desc) rnum
+			from product p left join member m on(p.seller = m.user_id)
+			               left join (select a.p_code p_code, count(b.p_code) wish from product a left outer join wish b on(a.p_code = b.p_code) group by a.p_code) wc on(wc.p_code = p.p_code)
+			               left join (select a.p_code p_code, count(b.p_code) chat from product a left outer join chat_room b on(a.p_code = b.p_code) group by a.p_code) cc on(cc.p_code = p.p_code)
+			               left join (select * from product_photo where photo_code in (select min(photo_code) from product_photo group by p_code)) photo on(p.p_code = photo.p_code)
+			where (p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N'
+			      and p.seller in (
+			                        select l.user_id 
+			                        from location l,(select latitude, longitude, radius from location where user_id = #{userId}) a
+			                        where calc_distance(a.latitude, a.longitude, l.latitude, l.longitude) < a.radius
+			                        )
+				   and p.seller not in (select block_id from block where user_id = #{userId}))
+	               or
+				   (p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N'
+			       and p.coupon = 1)
+			order by reg_date
+		)x
+		where x.rnum between 1 and 8
+	]]>	
+	</select>
+
+	<!-- 전체 리스트 -->
+	<select id="selectAll" resultType="productDTO">
+	<![CDATA[
+		select p.p_code, p.seller, p.title, p.price, p.pull, trunc(sysdate - p.reg_date) reg_date, substr(m.address, instr(m.address, ' ', 1, 1), instr(m.address, ' ', 1, 2)) address, wc.wish, cc.chat,
+			   photo.uuid, photo.original_filename, photo.upload_path
+		from product p left join member m on(p.seller = m.user_id)
+		               left join (select a.p_code p_code, count(b.p_code) wish from product a left outer join wish b on(a.p_code = b.p_code) group by a.p_code) wc on(wc.p_code = p.p_code)
+		               left join (select a.p_code p_code, count(b.p_code) chat from product a left outer join chat_room b on(a.p_code = b.p_code) group by a.p_code) cc on(cc.p_code = p.p_code)
+		               left join (select * from product_photo where photo_code in (select min(photo_code) from product_photo group by p_code)) photo on(p.p_code = photo.p_code)
+		where (p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N'
+		      and p.seller in (
+		                        select l.user_id 
+		                        from location l,(select latitude, longitude, radius from location where user_id = #{userId}) a
+		                        where calc_distance(a.latitude, a.longitude, l.latitude, l.longitude) < a.radius
+		                        )
+			   and p.seller not in (select block_id from block where user_id = #{userId}))
+               or
+			   (p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N'
+		       and p.coupon = 1)
+		order by reg_date
+	]]>
+	</select>
+	
+	<!-- 카테고리 리스트 -->
+	<select id="selectCategoryProducts" resultType="productDTO">
+	<![CDATA[
+		select p.p_code, p.seller, p.title, p.price, p.pull, trunc(sysdate - p.reg_date) reg_date, substr(m.address, instr(m.address, ' ', 1, 1), instr(m.address, ' ', 1, 2)) address, wc.wish, cc.chat,
+			   photo.uuid, photo.original_filename, photo.upload_path
+		from product p left join member m on(p.seller = m.user_id)
+		               left join (select a.p_code p_code, count(b.p_code) wish from product a left outer join wish b on(a.p_code = b.p_code) group by a.p_code) wc on(wc.p_code = p.p_code)
+		               left join (select a.p_code p_code, count(b.p_code) chat from product a left outer join chat_room b on(a.p_code = b.p_code) group by a.p_code) cc on(cc.p_code = p.p_code)
+		               left join (select * from product_photo where photo_code in (select min(photo_code) from product_photo group by p_code)) photo on(p.p_code = photo.p_code)
+		where (p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N' and p.category = #{categoryCode} 
+		      and p.seller in (
+		                        select l.user_id 
+		                        from location l,(select latitude, longitude, radius from location where user_id = #{userId}) a
+		                        where calc_distance(a.latitude, a.longitude, l.latitude, l.longitude) < a.radius
+		                        )
+			  and p.seller not in (select block_id from block where user_id = #{userId}))
+              or
+			  (p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N' and p.category = #{categoryCode} 
+		      and p.coupon = 1)
+		order by reg_date	
+	]]>
+	</select>
+
+	<!-- 검색결과 리스트 -->
+	<select id="search" resultType="productDTO">
+		select p.p_code, p.seller, p.title, p.price, p.pull, trunc(sysdate - p.reg_date) reg_date, substr(m.address, instr(m.address, ' ', 1, 1), instr(m.address, ' ', 1, 2)) address, wc.wish, cc.chat,
+			   photo.uuid, photo.original_filename, photo.upload_path
+		from product p left join member m on(p.seller = m.user_id)
+		               left join (select a.p_code p_code, count(b.p_code) wish from product a left outer join wish b on(a.p_code = b.p_code) group by a.p_code) wc on(wc.p_code = p.p_code)
+		               left join (select a.p_code p_code, count(b.p_code) chat from product a left outer join chat_room b on(a.p_code = b.p_code) group by a.p_code) cc on(cc.p_code = p.p_code)
+		               left join (select * from product_photo where photo_code in (select min(photo_code) from product_photo group by p_code)) photo on(p.p_code = photo.p_code)
+		<where>
+			((p.title like '%'||#{keyword}||'%' or p.content like '%'||#{keyword}||'%')
+			and p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N'
+			and p.seller in (
+	        	                select l.user_id 
+		                        from location l, (select latitude, longitude, radius from location where user_id = #{userId}) a
+								<![CDATA[
+		                        where calc_distance(a.latitude, a.longitude, l.latitude, l.longitude) < a.radius
+								]]>
+	                        )
+			and p.seller not in (select block_id from block where user_id = #{userId})
+			<if test="category != 0 ">
+			and p.category = #{category}
+			</if>)
+			or
+			((p.title like '%'||#{keyword}||'%' or p.content like '%'||#{keyword}||'%')
+			and p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N'
+			and p.coupon = 1
+			<if test="category != 0 ">
+			and p.category = #{category}
+			</if>)
+		</where>
+		order by reg_date
+	</select>
+	
+	<!-- 전체 상품수 -->
+	<select id="selectTotalCount" resultType="_int">
+	<![CDATA[
+		select count(*) from product p
+		where p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and p.delete_yn = 'N' 
+		      and p.seller in (
+		                        select l.user_id 
+		                        from location l,(select latitude, longitude, radius from location where user_id = #{userId}) a
+		                        where calc_distance(a.latitude, a.longitude, l.latitude, l.longitude) < a.radius
+		                        )
+              or
+              p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and p.delete_yn = 'N' 
+		      and p.coupon = 1
+	]]>
+	</select>
+	
+	<!-- 특정 카테고리 상품수 -->
+	<select id="selectCategoryCount" resultType="_int">
+	<![CDATA[
+		select count(p.p_code) from product p
+		where (p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N' and p.category = #{categoryCode} 
+		      and p.seller in (
+		                        select l.user_id 
+		                        from location l,(select latitude, longitude, radius from location where user_id = #{userId}) a
+		                        where calc_distance(a.latitude, a.longitude, l.latitude, l.longitude) < a.radius
+		                        )
+              and category = #{categoryCode})
+              or
+              (p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N' and p.category = #{categoryCode} 
+		      and p.coupon = 1
+              and category = #{categoryCode})
+              
+	]]>
+	</select>
+	
+	<!-- 검색 상품수 -->
+	<select id="selectSearchCount" resultType="_int">
+		select count(*) from product p
+		<where>
+			(title like '%'||#{keyword}||'%' or content like '%'||#{keyword}||'%')
+			and open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N'
+			and p.seller in (
+         	            		select l.user_id 
+            	         		from location l,(select latitude, longitude, radius from location where user_id = #{userId}) a
+								<![CDATA[
+                     			where calc_distance(a.latitude, a.longitude, l.latitude, l.longitude) < a.radius
+								]]>
+                   		  )
+		<if test="category != 0 ">
+			and p.category = #{category}
+		</if>
+		</where>
+		or
+		(title like '%'||#{keyword}||'%' or content like '%'||#{keyword}||'%')
+		and open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and delete_yn = 'N'
+		and p.coupon = 1
+		<if test="category != 0 ">
+			and p.category = #{category}
+		</if>
+	</select>
+	
+	<!-- 카테고리 -->
+	<select id="selectAllCategory" resultType="categoryVO">
+		select * from category where category_parent = 1 order by category_code
+	</select>
+	
+	<!-- 카테고리별 상품수 -->
+	<select id="selectAllCategoryCount" resultType="_int">
+	<![CDATA[
+		select count(p.category)
+		from category c 
+		left join (
+					select * 
+					from product 
+					where (seller in ( 
+										select l.user_id 
+										from location l,(select latitude, longitude, radius from location where user_id = #{userId}) a
+										where calc_distance(a.latitude, a.longitude, l.latitude, l.longitude) < a.radius
+									)
+						   and  open_status = 1 and (trade_status = 'S' or trade_status = 'R') and delete_yn = 'N')
+                           or
+                           (coupon = 1
+						   and  open_status = 1 and (trade_status = 'S' or trade_status = 'R') and delete_yn = 'N')
+				  ) p on(c.category_code = p.category)
+		where c.category_parent = 1
+		group by c.category_code order by c.category_code
+	]]>
+	</select>
+	
+	
+	<!-- 쿠폰 조회 -->
+	<select id="selectCoupon" resultType="couponDTO">
+		select coupon_name, expire_date, count(coupon_name) amount from coupon 
+		where user_id = #{userId} and usage_status = 0 group by(coupon_name, expire_date)
+	</select>
+	
+	<!-- 상품 등록 -->
+	<insert id="insert">
+		insert into product values
+		(seq_product.nextval, #{seller}, null, #{title}, #{category}, #{content}, #{price}, sysdate, 1, 'S', #{coupon}, #{offer}, 'N', 0)
+    	<selectKey keyProperty="pCode" resultType="_int" order="AFTER">
+		select seq_product.currval from dual
+		</selectKey>
+	</insert>
+	
+	<!-- 관심 목록 등록 -->
+	<insert id="addToWish">
+		insert into wish values
+		(seq_wish.nextval, #{userId}, #{pCode})
+	</insert>
+	
+	<!-- 상품 조회 -->
+	<select id="selectDTOByPCode" resultType="productDTO">
+		select p.p_code, p.seller, p.title, p.content, p.price, p.pull, trunc(sysdate - p.reg_date) reg_date, substr(m.address, instr(m.address, ' ', 1, 1), instr(m.address, ' ', 1, 2)) address, 
+			   p.category categoryCode, c.category_name category, p.trade_status, p.offer, wc.wish, cc.chat, p.reg_date original_reg_date, p.coupon, p.buyer
+		from product p left join member m on(p.seller = m.user_id)
+					   left join category c on(p.category = c.category_code)
+		               left join (select a.p_code p_code, count(b.p_code) wish from product a left outer join wish b on(a.p_code = b.p_code) group by a.p_code) wc on(wc.p_code = p.p_code)
+		               left join (select a.p_code p_code, count(b.p_code) chat from product a left outer join chat_room b on(a.p_code = b.p_code) group by a.p_code) cc on(cc.p_code = p.p_code)
+		where p.p_code = #{pCode}
+	</select>
+	<select id="selectVOByPCode" resultType="productVO">
+		select * from product where p_code = #{pCode}
+	</select>
+	
+	<!-- 판매자 정보 -->
+	<select id="selectSeller" resultType="sellerDTO">
+		select m.nickname, m.original_filename, m.renamed_filename, s.total_score/s.count score
+		from member m left join score s using(user_id)
+		where user_id = #{id}
+	</select>	
+	
+	<!-- 거래상태 변경 -->
+	<update id="changeStatus">
+		update product set trade_status = #{status} where p_code = #{pCode}
+	</update>
+	
+	<!-- 상품 수정 -->
+	<update id="update">
+		update product set 
+		title = #{title}, category = #{category}, content = #{content}, price = #{price}, coupon = #{coupon}, offer = #{offer}
+		where p_code = #{pCode}
+	</update>
+	
+	<!-- 상품 삭제 -->
+	<update id="delete">
+		update product set delete_yn = 'Y' where p_code = #{pCode}
+	</update>
+	
+	<!-- 끌올 -->
+	<update id="pull">
+		update product set pull = 1, reg_date = sysdate where p_code = #{pCode}
+	</update>	
+	<update id="pullWithPrice">
+		update product set pull = 1, reg_date = sysdate, price = #{price} where p_code = #{pCode}
+	</update>	
+	
+	<!-- 관련 상품 -->
+	<select id="selectSimilarProduct" resultType="productVO">
+		select p.p_code, p.title, p.price, photo.upload_path, photo.original_filename, photo.uuid from product p left join product_photo photo on(p.p_code = photo.p_code)
+		<where>
+		<foreach collection="keywords" item="k" open="(" close=")" separator="or">
+			p.title like '%'||#{k}||'%' 
+		</foreach>
+		and p.p_code not in (#{pCode}) and open_status = 1 and (trade_status = 'S' or trade_status = 'R') and p.delete_yn = 'N'
+		and p.seller in (
+   	            		select l.user_id 
+       	         		from location l,(select latitude, longitude, radius from location where user_id = #{userId}) a
+						<![CDATA[
+               			where calc_distance(a.latitude, a.longitude, l.latitude, l.longitude) < a.radius
+						]]>
+					   )
+		</where>
+		union
+		select p.p_code, p.title, p.price, photo.upload_path, photo.original_filename, photo.uuid from product p left join product_photo photo on(p.p_code = photo.p_code)
+		where p.category = #{category} and p.p_code not in (#{pCode}) and p.open_status = 1 and (p.trade_status = 'S' or p.trade_status = 'R') and p.delete_yn = 'N'
+	</select>
+	
+	<!-- 판매자 다른 상품 -->
+	<select id="selectOtherProducts" resultType="productDTO">
+		select 
+		    P.p_code, 
+		    P.title, 
+		    P.price,
+		    Photo.upload_path,
+		    photo.original_filename,
+		    photo.uuid
+		from product p
+		    left join (select * from product_photo where photo_code in (select min(photo_code) from product_photo group by p_code)) photo on(p.p_code = photo.p_code)
+		where seller = #{seller} and P.p_code != #{pCode} 
+		and open_status = 1 and (trade_status = 'S' or trade_status = 'R') and delete_yn = 'N'
+	</select>
+	
+	<!-- 신고목록 -->
+	<select id="reasonReport" resultType="reasonReportVO">
+		select * from reason_report where parent_code = 1
+	</select>
+	<select id="reportListByRCode" resultType="reasonReportVO">
+		select r.* ,connect_by_isleaf leaf
+        from  reason_report r
+        start with reason_code = #{reasonCode}
+        connect by prior reason_code=parent_code
+	</select>
+	
+	<!-- 신고하기 -->
+	<insert id="reportProduct">
+		insert into report values 
+		(seq_report.nextval, #{reasonCode}, #{reportId}, null, null, null, 0, #{pCode})
+	</insert>
+	<insert id="reportUser">
+		insert into report values 
+		(seq_report.nextval, #{reasonCode}, #{reportId}, #{shooterId}, null, null, 0, null)
+	</insert>
+	
+	<!-- 관심목록 가격 변동 알림을 위한 수신자 리스트 -->
+	<select id="selectWishUserId" resultType="string">
+		select wish.user_id from wish, product
+		where wish.p_code = product.p_code
+		and product.p_code = #{pCode}
+	</select>
+	
+	<!-- 상품 사진 추가 -->
+	<insert id="insertPhoto">
+		insert into product_photo values
+		(
+			seq_product_photo.nextval, null, #{originalFilename}, #{uuid}, #{uploadPath}
+		)
+	</insert>
+	
+	<!-- 상품사진 pCode update -->
+	<update id="updateProductCode" parameterType="java.util.Map">
+		update product_photo set p_code = #{pCode}
+		where uuid in
+		<foreach collection="uuids" item="item" index="i" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	
+	<!-- 상품 사진 삭제(게시글 등록 페이지) -->
+	<delete id="deletePhoto">
+		delete from product_photo where uuid = #{uuid}
+	</delete>
+	
+	<!-- 상품 사진 불러오기 -->
+	<select id="selectPhotos" resultType="productPhotoVO">
+		select * from product_photo where p_code = #{pCode}
+	</select>
+	
+	<!-- 신고관리(중고거래) -->
+	<select id="selectProductList" resultType="report">
+		select R.report_code, R.reason_code, R.report_id, R.p_code, RR.reason_content
+		from report R left join reason_report RR on R.reason_code = RR.reason_code
+		where R.p_code is not null
+	</select>
+	
+	<!-- 채팅했던 이웃들 -->
+	<select id="selectBuyer" resultType="string">
+		select user_id from chat_user
+		where room_code in (select room_code from chat_room where p_code = #{pCode})
+			  and user_id != #{seller} 
+	</select>
+	
+	<!-- 평가 하기 리스트 -->
+	<select id="selectEvaList" resultType="evaluation">
+		select * from evaluation where kind = #{kind} and (member = 'S' or member = 'C')
+	</select>
+	<select id="selectEvaListForBuyer" resultType="evaluation">
+		select * from evaluation where kind = #{kind} and (member = 'B' or member = 'C')
+	</select>
+	
+	<!-- 리뷰 -->
+	<update id="insertEva" parameterType="reviewDTO">
+		<foreach collection="evaCode" item="eva" separator=";" open="declare begin" close="; end;">
+			update evaluate set count =  nvl(count, 0) + 1 where user_id = #{receiver} and eva_code = #{eva}
+		</foreach>
+	</update>
+	<update id="insertScore">
+		update score set (total_score, count) = (select nvl(total_score, 0) + #{score}, nvl(count, 0) + 1 from score where user_id = #{receiver}) 
+		where user_id = #{receiver}
+	</update>
+	<insert id="insertReview">
+		insert into review values(seq_review.nextval, #{sender}, #{receiver}, #{content}, 'S',  #{pCode})
+	</insert>
+	<update id="updateBuyer">
+		update product set buyer = #{receiver} where p_code = #{pCode}
+	</update>
+	<update id="updateSeller">
+		update product set seller = #{receiver} where p_code = #{pCode}
+	</update>
+	<insert id="insertReivewByBuyer">
+		insert into review values(seq_review.nextval, #{sender}, #{receiver}, #{content}, 'B',  #{pCode})
+	</insert>
+	<select id="reviewISent" resultType="string">
+		select content from review where review_code = #{reviewCode}
+	</select>
+	
+	<!-- 숨기기 -->
+	<update id="hide">
+		update product set open_status = 0 where p_code = #{pCode}
+	</update>
+	<update id="show">
+		update product set open_status = 1 where p_code = #{pCode}
+	</update>
+</mapper>

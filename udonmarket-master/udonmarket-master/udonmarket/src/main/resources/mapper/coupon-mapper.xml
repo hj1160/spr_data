@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="coupon">
+
+	<select id="selectCouponList" resultMap="couponMap">
+		select *
+		from coupon
+		order by expire_date desc 
+	</select>
+	
+	<resultMap type="Coupon" id="couponMap">
+	</resultMap>
+	
+	<select id="selectCouponTotalContents" resultType="_int">
+		select count(*)
+		from coupon
+	</select>
+	
+	<insert id="insertCoupon">
+		insert into coupon
+		values (#{couponCode},#{userId},#{couponName},#{expireDate},#{usageStatus})
+	
+	</insert>
+
+</mapper>

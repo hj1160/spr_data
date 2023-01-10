@@ -55,7 +55,7 @@
 							            <option value="TCW"  <c:out value="${pageMaker.cri.type eq 'TCW' ? 'selected' : '' }"/> >제목+내용+작성자</option>
 						             </select>
 
-               						<input type="text" name="keyword" />
+               						<input type="text" name="keyword"  value="${pageMaker.cri.keyword}">
 				            		<input type="hidden" name="pageNum" value="${pageMaker.cri.pageNum}">
 						            <input type="hidden" name="amount" value="${pageMaker.cri.amount}">
 						            <button class="btn btn-primary">Search</button>
@@ -89,6 +89,9 @@
                             <form id='actionForm' action="/board/list" method='get'>
                                <input type='hidden' name='pageNum' value='${pageMaker.cri.pageNum}'>
                                <input type='hidden' name='amount' value='${pageMaker.cri.amount}'>
+                               <input type='hidden' name='type' value='${pageMaker.cri.type}'>
+                               <input type='hidden' name='keyword' value='${pageMaker.cri.keyword}'>
+                               
                             </form>
                             
                         </div>
